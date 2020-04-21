@@ -1,61 +1,80 @@
 const Logger = require("../logger");
-// const mute = process.env.NODE_ENV === "production";
-const logger = new Logger({ level: "info", mute: true });
+const mute = true; //process.env.NODE_ENV === "production";
+const logger = new Logger({ level: "info", mute });
 
 class LuxIo {
-  constructor(MAX_CONCURRENT_REQUEST = 1) {
-    this.requestQueue = [];
-    this.pendingRequests = [];
-    this.cacheRequest = {};
-    this.MAX_CONCURRENT_REQUEST = MAX_CONCURRENT_REQUEST;
-    logger.log({ MAX_CONCURRENT_REQUEST });
+  constructor(MAX_CONCURRENT_PROMISES = 1) {
+    this.promiseQueue = [];
+    this.pendingPromises = [];
+    this.promisesCache = {};
+    this.MAX_CONCURRENT_PROMISES = MAX_CONCURRENT_PROMISES;
+    logger.log({ MAX_CONCURRENT_PROMISES });
   }
 
-  push(incomingRequest) {
-    const isFull = this.requestQueue.length >= this.MAX_CONCURRENT_REQUEST;
-    logger.log({ isFull, requestQueue: this.requestQueue.length });
-    if (isFull) {
-      this.pendingRequests.push(incomingRequest);
-    } else {
-      this.requestQueue.push(incomingRequest);
-      if (this.requestQueue.length) this.requestExecutor(incomingRequest);
+  push(incomingPromise) {
+    const isFull = this.promiseQueue.length >= this.MAX_CONCURRENT_PROMISES;
+    logger.log({
+      isFull,
+      promiseQueue: this.promiseQueue.length,
+      pendingPromises: this.pendingPromises,
+    });
+    if (incomingPromise.cache) {
+      const inCache = this.promisesCache.hasOwnProperty(incomingPromise.id);
+      if (inCache) return this.responseFromCache(incomingPromise);
     }
+    if (isFull) return this.pendingPromises.push(incomingPromise);
+    this.promiseQueue.push(incomingPromise);
+    this.promiseExecutor(incomingPromise);
   }
 
-  resolveResponse({ id, cache, onResponse }, result, fromCache = false) {
-    this.requestQueue = this.requestQueue.filter(
-      (request) => request.id !== id
-    );
-    if (cache) {
-      this.cacheRequest[id] = result;
-    }
-    const [pending] = this.pendingRequests;
-    if (pending) {
-      this.requestQueue.push(pending);
-      this.pendingRequests.splice(0, 1);
-      if (this.requestQueue.length) {
-        const [request] = this.requestQueue;
-        this.requestExecutor(request);
-      }
-    }
-    return onResponse(result, fromCache);
-  }
-
-  requestExecutor(payload = {}) {
-    const { id = "", definition, cache = true, onResponse } = payload;
-    if (cache) {
-      const inCache = this.cacheRequest.hasOwnProperty(id);
-      if (inCache) {
-        return this.resolveResponse.bind(this, { id, cache, onResponse })(
-          this.cacheRequest[id],
-          true
-        );
-      }
-    }
+  responseFromCache(incomingPromise) {
+    const { definition, onResult } = incomingPromise;
     return definition()
-      .then(this.resolveResponse.bind(this, { id, cache, onResponse }))
-      .catch(this.resolveResponse.bind(this, { id, cache, onResponse }));
+      .then((result) => onResult({ result, fromCache: true, error: true }))
+      .catch((result) => onResult({ result, fromCache: true, error: true }));
+  }
+
+  removeFinishPromise(queue, id) {
+    return queue.filter((promise) => promise.id !== id);
+  }
+
+  handlePromiseResult(
+    { id, cache, onResult, error },
+    result,
+    fromCache = false
+  ) {
+    this.promiseQueue = this.promiseQueue.filter(
+      (promise) => promise.id !== id
+    );
+    if (cache) this.promisesCache[id] = { result, error };
+    const [pending] = this.pendingPromises;
+    if (pending) {
+      this.push(pending);
+      this.pendingPromises.splice(0, 1);
+    }
+    return onResult({ result, fromCache, error });
+  }
+
+  promiseExecutor(payload = {}) {
+    const { id = "", definition, cache = true, onResult } = payload;
+    return definition()
+      .then(
+        this.handlePromiseResult.bind(this, {
+          id,
+          cache,
+          onResult,
+          error: false,
+        })
+      )
+      .catch(
+        this.handlePromiseResult.bind(this, {
+          id,
+          cache,
+          onResult,
+          error: true,
+        })
+      );
   }
 }
 
-exports.lx = LuxIo;
+exports.Lx = LuxIo;
