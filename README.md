@@ -12,16 +12,16 @@ npm install lux-io --save
 In order to use lux-io you should import it first, then create a new instance of the class lx, now the instance have the main method of lux-io which is `push`, this method allow you to add n amount of operations, a operation is defined as and object that have all information to perform a promise execution
 
 ```javascript
-// import lux-io
-import { Lx } from 'lux-io'; #import lux-io as lx
-const stream = new Lx(1);// as unique argument the contructor receive the maximum number of promises to executate at the same time.
+import { Lx } from 'lux-io'; //import lux-io
+const LxStream = new Lx(1);
+// as unique argument the contructor receive the maximum number of promises to executate at the same time.
 const operation = {
   id: 1,
   onResult: ({result, fromCache}) => console.log({ result, fromCache }), // { result: 1, fromCache: false }
   definition: () => Promise.resolve(1)
 }; # define operation to perform
 
-stream.push(operation);
+LxStream.push(operation);
 ```
 The operation object must have this shape:
 
@@ -30,7 +30,7 @@ The operation object must have this shape:
 | id         | Number or String | true      | undefined  | Unique identifier                                          |
 | cache      | Function         | true      | undefined  | Flag that allows you to save the promise result in cache   |
 | definition | Function         | true      | undefined  | A function that must return the  promise to execute        |
-| onResponse | Function         | false     | undefined  | A function that is called when the promise finish          |
+| onResult   | Function         | true      | undefined  | A function that is called when the promise finish          |
 
 # Use cases
 `lux-io` can be very handy in the cases like:
