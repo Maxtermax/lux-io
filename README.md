@@ -5,7 +5,7 @@ The applications in this library have no limits, only your imagination.
 
 # Instalation
 ```
-npm install lux-io --save
+npm i @maxtermax/lux-io --save
 ```
 
 # Get started
@@ -19,7 +19,7 @@ const operation = {
   id: 1,
   onResult: ({result, fromCache}) => console.log({ result, fromCache }), // { result: 1, fromCache: false }
   definition: () => Promise.resolve(1)
-}; # define operation to perform
+};// define operation to perform
 
 LxStream.push(operation);
 ```
@@ -62,14 +62,14 @@ const operationOne = {
 const operationTwo = {
   id: 2,
   cache: true,
-  onResponse: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),
   definition: () => promiseTimeout(() => Promise.resolve(2), 500),
 };
 
 const operationThree = {
   id: 3,
   cache: true,
-  onResponse: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),
   definition: () => promiseTimeout(() => Promise.resolve(3), 100),
 };
 LxStream.push(operationOne);// { result: 1 }
@@ -146,7 +146,7 @@ fetchAllTodos(todos);
 
 # Inner workings
 
-When you try to push more promises than are allowed into the queue those  promises wait in a pending list of promises whitout execute, until at least one of the promises in the main queue get resolved or rejected,  when that happend one of the pending promises get push into the main queue.
+When you try to push more promises than are allowed into the queue those  promises wait in a pending list of promises without execute, until at least one of the promises in the main queue get resolved or rejected,  when that happend one of the pending promises get push into the main queue.
 
 The same process get execuate over and over againt until all the promises get exectuted.
 
