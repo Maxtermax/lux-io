@@ -1,0 +1,29 @@
+{
+  "name": "lux-io",
+  "version": "1.0.0",
+  "description": "Is a tiny javascript library for handle concurrent promise execution, limiting the maximum amount of promises execution at the same time",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jest ."
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ]
+  },
+  "keywords": [
+    "lux-oi",
+    "hackdo",
+    "maxtermax",
+    "promises"
+  ],
+  "author": "maxtermax",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^25.4.0",
+    "jest-extended": "^0.11.5"
+  },
+  "dependencies": {
+    "winston": "^3.2.1"
+  }
+}
