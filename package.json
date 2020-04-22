@@ -1,6 +1,6 @@
 {
   "name": "@maxtermax/lux-io",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Is a tiny javascript library for handle concurrent promise execution, limiting the maximum amount of promises execution at the same time",
   "main": "index.js",
   "scripts": {
@@ -20,6 +20,10 @@
   ],
   "author": "maxtermax",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Maxtermax/lux-io"
+  },
   "devDependencies": {
     "jest": "^25.4.0",
     "jest-extended": "^0.11.5"
