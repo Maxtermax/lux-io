@@ -1,6 +1,6 @@
 {
-  "name": "lux-io",
-  "version": "1.0.0",
+  "name": "@maxtermax/lux-io",
+  "version": "1.0.2",
   "description": "Is a tiny javascript library for handle concurrent promise execution, limiting the maximum amount of promises execution at the same time",
   "main": "index.js",
   "scripts": {

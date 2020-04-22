@@ -28,10 +28,9 @@ class LuxIo {
   }
 
   responseFromCache(incomingPromise) {
-    const { definition, onResult } = incomingPromise;
-    return definition()
-      .then((result) => onResult({ result, fromCache: true, error: true }))
-      .catch((result) => onResult({ result, fromCache: true, error: true }));
+    const { id, onResult } = incomingPromise;
+    const { error, result } = this.promisesCache[id];
+    return onResult({ result, fromCache: true, error });
   }
 
   removeFinishPromise(queue, id) {
@@ -43,9 +42,7 @@ class LuxIo {
     result,
     fromCache = false
   ) {
-    this.promiseQueue = this.promiseQueue.filter(
-      (promise) => promise.id !== id
-    );
+    this.promiseQueue = this.removeFinishPromise(this.promiseQueue, id);
     if (cache) this.promisesCache[id] = { result, error };
     const [pending] = this.pendingPromises;
     if (pending) {
