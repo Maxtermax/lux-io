@@ -114,7 +114,7 @@ Note that the todo with `id` 1 is repeated in the array of todos because of that
 
 ```javascript
 import { Lx } from '@maxtermax/lux-io';
-const LxStream = new Lx(2);
+const LxStream = new Lx(2); //Only 2 promises are allowed to be executed at the same time.
 
 async function getTodo(id) {
   return fetch(
@@ -145,6 +145,10 @@ fetchAllTodos(todos);
 { todo: 5, fromCache: false, result:{...} }
 */
 ```
+Note the request `1` only appears once, and the next request come from the internal cache of `lux-io` so this way avoid to repeat the same http call, for this example also notice that the requests come in pairs
+ 
+![Application network](https://i.imgur.com/bgU8neh.png "Application network")
+
 
 
 # Inner workings
