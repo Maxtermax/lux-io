@@ -12,7 +12,7 @@ npm i @maxtermax/lux-io --save
 In order to use lux-io you should import it first, then create a new instance of the class lx, now the instance have the main method of lux-io which is `push`, this method allow you to add n amount of operations, a operation is defined as and object that have all information to perform a promise execution
 
 ```javascript
-import { Lx } from 'lux-io'; //import lux-io
+import { Lx } from '@maxtermax/lux-io'; //import lux-io
 const LxStream = new Lx(1);
 // as unique argument the contructor receive the maximum number of promises to executate at the same time.
 const operation = {
@@ -43,7 +43,7 @@ The operation object must have this shape:
 In this example you will notice that only 2 promises are executed at a time regardless of the time it takes to finish, this behavior occurs because the maximum number of promises to execute at the same time is 2, in this case lux-io will give you execution priority to the first 2 promises pushed, when one of those ends it will continue with the next one in the pending list.
 
 ```javascript
-import { lx } from 'lux-io';// import lux-io as lx
+import { Lx } from '@maxtermax/lux-io';// import lux-io as lx
 const LxStream = new Lx(2);
 
 function promiseTimeout(cb, TIME) {
@@ -85,15 +85,18 @@ Note that this feature really depends of the time execution, this also depends o
 You can also can deactivate the `cache` by set the property to `false` in that case all the cache thing will be ignored
 
 ```javascript
- const LxStream = new Lx(1);
+import { Lx } from '@maxtermax/lux-io';
+const LxStream = new Lx(1);
 
- const operationOne = {
+const operationOne = {
   id: 1,
   cache: true,
   onResult: ({ fromCache }) => console.log({fromCache}),// { fromCache: false }
   definition: () => Promise.resolve(1),
-};
+}
+
 LxStream.push(operationOne);
+
 const operationTwo = {
   id: 1,
   cache: true,
@@ -110,8 +113,8 @@ in this example are allowed only 2 call at the same time.
 Note that the todo with `id` 1 is repeated in the array of todos because of that in the second call of the todo with `id` id the response is immediate, because it come from the `cache`.
 
 ```javascript
-import { lx } from 'lux-io';
-const LxStream = new LuxIo(2);
+import { Lx } from '@maxtermax/lux-io';
+const LxStream = new Lx(2);
 
 async function getTodo(id) {
   return fetch(
