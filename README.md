@@ -63,7 +63,7 @@ function promiseTimeout(cb, TIME) {
 const operationOne = {
   id: 1,
   cache: true,
-  onResponse: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),
   definition: () => promiseTimeout(() => Promise.resolve(1), 1000),
 };
 
