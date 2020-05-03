@@ -11,6 +11,28 @@ class LuxIo {
     logger.log({ MAX_CONCURRENT_PROMISES });
   }
 
+  pull(id) {
+    const queueIndex = this.promiseQueue.map((item) => item.id).indexOf(id);
+    const pendingIndex = this.pendingPromises
+      .map((item) => item.id)
+      .indexOf(id);
+
+    if (queueIndex !== -1) this.promiseQueue.splice(queueIndex, 1);
+    if (pendingIndex !== -1) this.pendingPromises.splice(pendingIndex, 1);
+  }
+
+  getFromCache(id) {
+    return this.promisesCache[id];
+  }
+
+  clearCache() {
+    this.promisesCache = {};
+  }
+
+  removeFromCache(id) {
+    delete this.promisesCache[id];
+  }
+
   push(incomingPromise) {
     const isFull = this.promiseQueue.length >= this.MAX_CONCURRENT_PROMISES;
     logger.log({
@@ -43,7 +65,8 @@ class LuxIo {
     fromCache = false
   ) {
     this.promiseQueue = this.removeFinishPromise(this.promiseQueue, id);
-    if (cache) this.promisesCache[id] = { result, error };
+    const shouldSaveInCache = cache && !error;
+    if (shouldSaveInCache) this.promisesCache[id] = { result, error };
     const [pending] = this.pendingPromises;
     if (pending) {
       this.push(pending);
