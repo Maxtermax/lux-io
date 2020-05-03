@@ -32,13 +32,21 @@ The operation object must have this shape:
 | definition | Function         | true      | undefined  | A function that must return the  promise to execute        |
 | onResult   | Function         | true      | undefined  | A function that is called when the promise finish          |
 
+The `onResult` is a callback that give you the result of the operation, with a object with this shape: 
+
+| key        | value    | description                                                                                  |  
+|:----------:|:--------:|:---------------------------------------------------------------------------------------------|
+| fromCache  | Boolean  | Boolean value that tell you if the result of the operation come from cache or not            |
+| result     | Any      | Result of the promise execution could be any type depending on what value the promise return | 
+| error      | Boolean  | Boolean value that tell you if the result of the operation was rejected of fulfilled         |
+
+
 # Use cases
 `lux-io` can be very handy in the cases like:
 - Reduce the server load by limiting the amount in requests sended by the client at the same time.
 - Use the cache for speed the time response of a program like an ajax call, or database request.
 
 # Examples
-
 ## Push multiples operations
 In this example you will notice that only 2 promises are executed at a time regardless of the time it takes to finish, this behavior occurs because the maximum number of promises to execute at the same time is 2, in this case lux-io will give you execution priority to the first 2 promises pushed, when one of those ends it will continue with the next one in the pending list.
 
@@ -149,7 +157,87 @@ Note the request `1` only appears once, and the next request come from the inter
  
 ![Application network](https://i.imgur.com/bgU8neh.png "Application network")
 
+# Api
 
+## Push
+This method allow you to push operations into the stream, this method must receive a operation object.
+
+```javascript
+const LxStream = new Lx(1);
+const operation = {
+  id: 1,
+  cache: true,
+  onResponse: ({result}) => console.log({result}),
+  definition: () => Promise.resolve(1)
+};
+LxStream.push(operation);
+```
+## Pull
+This method allow you to pull operations out the stream, in order the pull an operation this method must receive the
+operation id, note this method will only have effect on pending operations.
+
+The pending operations will be in queue for later execution in this example the pending operation will be `operationTwo` because for this particular example the `MAX_CONCURRENT_PROMISES` is `1`.
+
+```javascript
+const LxStream = new Lx(1);
+const operationOne = {
+  id: 1,
+  cache: true,
+  onResult: () => console.log("just this callback will be called"),
+  definition: () => promiseTimeout(() => Promise.resolve("TEST"), 0),
+};
+const operationTwo = {
+  id: 2,
+  cache: true,
+  onResult: () => console.log("this callback never will be called"),
+  definition: () => promiseTimeout(() => Promise.resolve("TEST"), 1000),
+};
+LxStream.push(operationOne);
+LxStream.push(operationTwo);
+LxStream.pull(2);
+```
+## removeFromCache 
+This method allow you to delete operations previously saved in cache, this method must receive the
+operation id.
+
+Note this method only will take effect if the operation was previously saved in cache
+```javascript
+ const LxStream = new Lx(1);
+ const id = 1;
+ const operation = {
+   id,
+   cache: true,
+   onResult: ({ fromCache }) => console.log({ fromCache }),
+   definition: () => promiseTimeout(() => Promise.resolve("TEST"), 0),
+ };
+ LxStream.push(operation);
+ LxStream.push(operation);// this method will come from cache
+ setTimeout(() => {
+   LxStream.removeFromCache(id);
+   LxStream.push(operation);// this method will not come from cache
+ }, 1000)
+```
+
+## clearCache 
+This method allow you to all delete operations previously saved in cache.
+
+Note this method only will take effect if the operations was previously saved in cache.
+```javascript
+ const LxStream = new Lx(1);
+ const id = 1;
+ const operation = {
+   id,
+   cache: true,
+   onResult: ({ fromCache }) => console.log({ fromCache }),
+   definition: () => promiseTimeout(() => Promise.resolve("TEST"), 0),
+ };
+ LxStream.push(operation);
+ LxStream.push(operation);// this method will come from cache
+ setTimeout(() => {
+   LxStream.clearCache();// delete cache
+   LxStream.push(operation);// this method will not come from cache
+ }, 1000)
+```
 
 # Inner workings
 
