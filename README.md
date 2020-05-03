@@ -167,7 +167,7 @@ const LxStream = new Lx(1);
 const operation = {
   id: 1,
   cache: true,
-  onResponse: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),
   definition: () => Promise.resolve(1)
 };
 LxStream.push(operation);
