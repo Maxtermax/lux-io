@@ -13,7 +13,8 @@ In order to use lux-io you should import it first, then create a new instance of
 
 ```javascript
 import { Lx } from '@maxtermax/lux-io'; //import lux-io
-const LxStream = new Lx(1);
+const MAX_CONCURRENT_PROMISES = 1;
+const LxStream = new Lx(MAX_CONCURRENT_PROMISES);
 // as unique argument the contructor receive the maximum number of promises to executate at the same time.
 const operation = {
   id: 1,
@@ -211,10 +212,10 @@ Note this method only will take effect if the operation was previously saved in 
    definition: () => promiseTimeout(() => Promise.resolve("TEST"), 0),
  };
  LxStream.push(operation);
- LxStream.push(operation);// this method will come from cache
+ LxStream.push(operation);// this result will come from cache
  setTimeout(() => {
    LxStream.removeFromCache(id);
-   LxStream.push(operation);// this method will not come from cache
+   LxStream.push(operation);// this result will not come from cache
  }, 1000)
 ```
 
@@ -232,10 +233,10 @@ Note this method only will take effect if the operations was previously saved in
    definition: () => promiseTimeout(() => Promise.resolve("TEST"), 0),
  };
  LxStream.push(operation);
- LxStream.push(operation);// this method will come from cache
+ LxStream.push(operation);// this result will come from cache
  setTimeout(() => {
    LxStream.clearCache();// delete cache
-   LxStream.push(operation);// this method will not come from cache
+   LxStream.push(operation);// this result will not come from cache
  }, 1000)
 ```
 
