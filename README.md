@@ -64,26 +64,26 @@ function promiseTimeout(cb, TIME) {
 const operationOne = {
   id: 1,
   cache: true,
-  onResult: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),//resolve third
   definition: () => promiseTimeout(() => Promise.resolve(1), 1000),
 };
 
 const operationTwo = {
   id: 2,
   cache: true,
-  onResult: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),//resolve first
   definition: () => promiseTimeout(() => Promise.resolve(2), 500),
 };
 
 const operationThree = {
   id: 3,
   cache: true,
-  onResult: ({result}) => console.log({result}),
+  onResult: ({result}) => console.log({result}),//resolve second
   definition: () => promiseTimeout(() => Promise.resolve(3), 100),
 };
-LxStream.push(operationOne);// { result: 1 }
-LxStream.push(operationTwo);// { result: 2 }
-LxStream.push(operationThree);// { result: 3 }
+LxStream.push(operationOne);
+LxStream.push(operationTwo);
+LxStream.push(operationThree);
 ```
 
 ## Using cache
