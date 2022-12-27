@@ -3,7 +3,7 @@ Lux io is a simple class that allow you to perform promises excecutions in queue
 
 The applications in this library have no limits, only your imagination.
 
-# Instalation
+# Installation
 ```
 npm i @maxtermax/lux-io --save
 ```
